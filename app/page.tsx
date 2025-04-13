@@ -60,19 +60,19 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen font-serif bg-gray-100">
       <div className="m-8">
         <div className="p-4"></div>
         <FilterBar onFilterChange={handleFilterChange} />
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-64">
+        <div className="flex justify-center font-serif items-center h-64">
           <p className="text-xl text-gray-500">Loading companies...</p>
         </div>
       ) : companies.length === 0 ? (
         <div className="bg-white rounded-lg shadow-md p-8 text-center">
-          <p className="text-lg text-gray-600">No companies found matching your criteria.</p>
+          <p className="text-lg font-serif text-gray-600">No companies found matching your criteria.</p>
           <button 
             onClick={() => {
               setFilters({});

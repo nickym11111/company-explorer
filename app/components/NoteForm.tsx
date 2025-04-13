@@ -40,9 +40,7 @@ const NoteForm: React.FC<NoteFormProps> = ({ company, onSubmit, onClose }) => {
           
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label htmlFor="note-content" className="block text-sm font-medium text-gray-900 mb-1">
-                Note Content
-              </label>
+              
               <textarea
                 id="note-content"
                 value={content}

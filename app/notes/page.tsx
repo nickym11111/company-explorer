@@ -83,11 +83,11 @@ export default function NotesPage() {
 
       {loading ? (
         <div className="flex justify-center items-center h-64 ">
-          <p className="text-xl text-gray-500">Loading notes...</p>
+          <p className="text-xl text-gray-500 font-serif ">Loading notes...</p>
         </div>
       ) : Object.keys(notesByCompany).length === 0 ? (
         <div className="bg-white rounded-lg shadow-md p-8 text-center">
-          <p className="text-lg text-gray-600">No notes found. Add notes to companies from the main page.</p>
+          <p className="text-lg text-gray-600 font-serif ">No notes found. Add notes to companies from the Companies page.</p>
         </div>
       ) : (
         <div className="space-y-8">

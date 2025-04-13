@@ -62,7 +62,9 @@ def get_notes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
             "hq_location": note.company.hq_location,
             "description": note.company.description,
             "year_founded": note.company.year_founded,
-            "headcount": note.company.headcount
+            "headcount": note.company.headcount,
+            "domain": note.company.domain,
+            "linkedin_url": note.company.linkedin_url
         }
 
         

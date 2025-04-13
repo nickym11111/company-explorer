@@ -58,7 +58,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({ company, onClose }) => {
                   <p>
                     <span className="font-medium font-serif">Website:</span>{" "}
                     <a
-                      href={company.domain}
+                      href={company.domain.startsWith("http") ? company.domain : `https://${company.domain}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 font-serif hover:underline"
