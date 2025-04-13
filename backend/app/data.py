@@ -34,12 +34,14 @@ def init_db():
         import_data_from_csv()
 
 def import_data_from_csv():
-    if not os.path.exists("companies.csv"):
+    if not os.path.exists("./tidemark_case_study_fullstack.csv"):
         print("CSV file not found")
         return
     
-    df = pd.read_csv("companies.csv")
+    df = pd.read_csv("./tidemark_case_study_fullstack.csv", encoding="ISO-8859-1")
     # normalize names
+    df = df.drop_duplicates(subset=["ENTITY_ID"])
+
     df.columns = [col.lower().replace(' ', '_') for col in df.columns]
     
     column_mapping = {
@@ -57,17 +59,15 @@ def import_data_from_csv():
         'keywords': 'keywords'
     }
     
-    # get only columns that are in my csv
+    # get only columns that are in the data
     columns_to_use = [col for col in column_mapping.keys() if col in df.columns]
     df = df[columns_to_use]
     
     # rename columns based on my mapping
     df.rename(columns={col: column_mapping[col] for col in columns_to_use}, inplace=True)
     
-    # make a database connection
     conn = sqlite3.connect("companies.db")
     
-    # Write to the database
     df.to_sql("companies", conn, if_exists="append", index=False)
     conn.close()
     

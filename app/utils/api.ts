@@ -1,16 +1,21 @@
 const API_BASE_URL = 'http://localhost:8000';
 
 interface Company {
-  id: number;
-  name: string;
-  hq_location: string;
-  industry: string;
-  founded_year: number;
-  headcount: number;
-  website?: string;
-  description?: string;
-  logo_url?: string;
-}
+    id: number;
+    name: string;
+    domain?: string;
+    headcount?: number;
+    year_founded?: number;
+    hq_location?: string;
+    description?: string;
+    linkedin_url?: string;
+    keywords?: string;
+    entity_id?: number;
+    headcount_change_3m?: number;
+    headcount_change_6m?: number;
+    headcount_change_1y?: number;
+  }
+  
 
 interface Note {
   id: number;
@@ -25,22 +30,48 @@ interface CreateNoteData {
   content: string;
 }
 
+export interface CompanyFilter {
+    search?: string;
+    hq_location?: string;
+    min_year?: string;
+    max_year?: string;
+    min_headcount?: string;
+    max_headcount?: string;
+  }
+  
+
 const api = {
   // Companies
-  async getCompanies(params = {}): Promise<Company[]> {
-    const queryString = new URLSearchParams(
-        Object.entries(params).filter(([_, v]) => v !== '') as [string, string][]
-      ).toString();      
-    
-    const url = `${API_BASE_URL}/companies${queryString ? `?${queryString}` : ''}`;
-    const response = await fetch(url);
-    
+  async getCompanies(filters: CompanyFilter = {}): Promise<Company[]> {
+    const params = new URLSearchParams();
+  
+    // Optional filters
+    if (filters.search) params.append("search", filters.search);
+    if (filters.hq_location) params.append("hq_location", filters.hq_location);
+    if (filters.min_year) params.append("min_year", filters.min_year);
+    if (filters.max_year) params.append("max_year", filters.max_year);
+    if (filters.min_headcount) params.append("min_headcount", filters.min_headcount);
+    if (filters.max_headcount) params.append("max_headcount", filters.max_headcount);
+  
+    // Pagination params (optional: can be made dynamic too)
+    params.append("skip", "0");
+    params.append("limit", "24");
+  
+    const url = `${API_BASE_URL}/companies?${params.toString()}`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+  
     if (!response.ok) {
       throw new Error(`Failed to fetch companies: ${response.statusText}`);
     }
-    
+  
     return response.json();
-  },
+  }
+  ,
   
   async getCompany(id: number): Promise<Company> {
     const response = await fetch(`${API_BASE_URL}/companies/${id}`);

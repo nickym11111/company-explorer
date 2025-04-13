@@ -5,6 +5,8 @@ from app.data import get_db
 from app.components.company import Company
 from pydantic import BaseModel
 from sqlalchemy import or_
+from rapidfuzz import fuzz
+
 
 router = APIRouter()
 
@@ -30,7 +32,11 @@ class CompanyResponse(CompanyBase):
     class Config:
         orm_mode = True
 
-@router.get("/", response_model=List[CompanyResponse])
+@router.get("/test")
+def test_companies_route():
+    return {"message": "Companies route works"}
+
+@router.get("", response_model=List[CompanyResponse])
 def get_companies(
     search: Optional[str] = None,
     hq_location: Optional[str] = None,
@@ -46,7 +52,8 @@ def get_companies(
     query = db.query(Company)
     
     # Applies filters
-    if search:
+    """
+        if search:
         query = query.filter(
             or_(
                 Company.name.ilike(f"%{search}%"),
@@ -54,6 +61,8 @@ def get_companies(
                 Company.keywords.ilike(f"%{search}%")
             )
         )
+    """
+
     
     if hq_location:
         query = query.filter(Company.hq_location.ilike(f"%{hq_location}%"))
@@ -70,7 +79,37 @@ def get_companies(
     if max_headcount:
         query = query.filter(Company.headcount <= max_headcount)
     
-    return query.offset(skip).limit(limit).all()
+    results = query.all()
+
+    if search:
+        # Apply fuzzy filtering in Python
+        search_lower = search.lower()
+        filtered = []
+        for company in results:
+            fields = [company.name, company.description, company.keywords]
+            max_score = max(
+                fuzz.partial_ratio(search_lower, str(field).lower()) 
+                for field in fields if field
+            )
+            if max_score >= 70:  # threshold can be adjusted
+                filtered.append(company)
+        return filtered[skip: skip + limit]
+
+    return results[skip: skip + limit]
+
+
+
+
+@router.get("/locations", response_model=List[str])
+def get_unique_locations(db: Session = Depends(get_db)):
+    # Get all unique non-null locations
+    locations = db.query(Company.hq_location).filter(Company.hq_location.isnot(None)).distinct().all()
+    return [loc[0] for loc in locations if loc[0]]
+
+@router.get("/founded-years", response_model=List[int])
+def get_founded_years(db: Session = Depends(get_db)):
+    years = db.query(Company.year_founded).filter(Company.year_founded.isnot(None)).distinct().order_by(Company.year_founded).all()
+    return [year[0] for year in years if year[0]]
 
 @router.get("/{company_id}", response_model=CompanyResponse)
 def get_company(company_id: int, db: Session = Depends(get_db)):
@@ -79,16 +118,3 @@ def get_company(company_id: int, db: Session = Depends(get_db)):
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     return company
-
-@router.get("/locations", response_model=List[str])
-def get_unique_locations(db: Session = Depends(get_db)):
-    """Get a list of unique HQ locations"""
-    # Get all unique non-null locations
-    locations = db.query(Company.hq_location).filter(Company.hq_location.isnot(None)).distinct().all()
-    return [loc[0] for loc in locations if loc[0]]
-
-@router.get("/founded-years", response_model=List[int])
-def get_founded_years(db: Session = Depends(get_db)):
-    """Get a list of unique founding years"""
-    years = db.query(Company.year_founded).filter(Company.year_founded.isnot(None)).distinct().order_by(Company.year_founded).all()
-    return [year[0] for year in years if year[0]]

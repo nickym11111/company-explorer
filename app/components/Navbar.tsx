@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -7,7 +7,7 @@ const Navbar = () => {
   const pathname = usePathname();
   
   return (
-    <nav className="bg-blue-600 text-white shadow-md">
+    <nav className="bg-blue-600 text-white font-serif shadow-md">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="font-bold text-xl">

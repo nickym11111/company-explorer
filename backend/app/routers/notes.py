@@ -27,7 +27,7 @@ class NoteResponse(NoteBase):
 class NoteWithCompany(NoteResponse):
     company: Optional[dict] = None
 
-@router.post("/", response_model=NoteResponse)
+@router.post("", response_model=NoteResponse)
 def create_note(note: NoteCreate, db: Session = Depends(get_db)):
     """Create a note for a company"""
     # Verify company exists
@@ -47,7 +47,7 @@ def create_note(note: NoteCreate, db: Session = Depends(get_db)):
     
     return db_note
 
-@router.get("/", response_model=List[NoteWithCompany])
+@router.get("", response_model=List[NoteWithCompany])
 def get_notes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Get all notes with company information"""
     notes = db.query(Note).options(joinedload(Note.company)).order_by(Note.created_at.desc()).offset(skip).limit(limit).all()
@@ -55,12 +55,16 @@ def get_notes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     # Format the response to include company information
     result = []
     for note in notes:
+        
         company_data = {
             "id": note.company.id,
             "name": note.company.name,
             "hq_location": note.company.hq_location,
-            "description": note.company.description
+            "description": note.company.description,
+            "year_founded": note.company.year_founded,
+            "headcount": note.company.headcount
         }
+
         
         note_data = {
             "id": note.id,

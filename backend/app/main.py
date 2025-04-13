@@ -15,8 +15,8 @@ app.add_middleware(
 )
 
 # add routers
-app.include_router(companies.router, prefix="/api/companies", tags=["companies"])
-app.include_router(notes.router, prefix="/api/notes", tags=["notes"])
+app.include_router(companies.router,prefix="/companies", tags=["companies"])
+app.include_router(notes.router,prefix="/notes", tags=["notes"])
 
 @app.on_event("startup")
 def startup_event():
