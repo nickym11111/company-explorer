@@ -48,7 +48,7 @@ def get_companies(
     limit: int = 100,
     db: Session = Depends(get_db)
 ):
-    """Get a list of companies with optional filters"""
+    #Get a list of companies with optional filters
     query = db.query(Company)
     
     # Applies filters
@@ -82,7 +82,7 @@ def get_companies(
     results = query.all()
 
     if search:
-        # Apply fuzzy filtering in Python
+        # Apply fuzzy filtering 
         search_lower = search.lower()
         filtered = []
         for company in results:
@@ -113,7 +113,7 @@ def get_founded_years(db: Session = Depends(get_db)):
 
 @router.get("/{company_id}", response_model=CompanyResponse)
 def get_company(company_id: int, db: Session = Depends(get_db)):
-    """Get a specific company by ID"""
+    #Get a specific company by ID
     company = db.query(Company).filter(Company.id == company_id).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")

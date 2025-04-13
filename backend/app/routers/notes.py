@@ -7,7 +7,7 @@ from app.components.company import Company
 from pydantic import BaseModel
 from datetime import datetime
 
-router = APIRouter()
+router = APIRouter()  # sets up sub router for this file 
 
 # basic schemas
 class NoteBase(BaseModel):
@@ -29,7 +29,7 @@ class NoteWithCompany(NoteResponse):
 
 @router.post("", response_model=NoteResponse)
 def create_note(note: NoteCreate, db: Session = Depends(get_db)):
-    """Create a note for a company"""
+    # Creates a note for a company
     # Verify company exists
     company = db.query(Company).filter(Company.id == note.company_id).first()
     if not company:
@@ -49,13 +49,13 @@ def create_note(note: NoteCreate, db: Session = Depends(get_db)):
 
 @router.get("", response_model=List[NoteWithCompany])
 def get_notes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    """Get all notes with company information"""
+    #Get all notes with company information
     notes = db.query(Note).options(joinedload(Note.company)).order_by(Note.created_at.desc()).offset(skip).limit(limit).all()
     
     # Format the response to include company information
     result = []
     for note in notes:
-        
+
         company_data = {
             "id": note.company.id,
             "name": note.company.name,
@@ -80,12 +80,12 @@ def get_notes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 
 @router.get("/company/{company_id}", response_model=List[NoteResponse])
 def get_notes_by_company(company_id: int, db: Session = Depends(get_db)):
-    """Get all notes for a specific company"""
+    #Get all notes for a specific company
     return db.query(Note).filter(Note.company_id == company_id).order_by(Note.created_at.desc()).all()
 
 @router.delete("/{note_id}", response_model=dict)
 def delete_note(note_id: int, db: Session = Depends(get_db)):
-    """Delete a note"""
+    #Delete a note
     note = db.query(Note).filter(Note.id == note_id).first()
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")

@@ -53,9 +53,9 @@ const api = {
     if (filters.min_headcount) params.append("min_headcount", filters.min_headcount);
     if (filters.max_headcount) params.append("max_headcount", filters.max_headcount);
   
-    // Pagination params (optional: can be made dynamic too)
+    // params (optional: can be made dynamic too)
     params.append("skip", "0");
-    params.append("limit", "24");
+    params.append("limit", "54");
   
     const url = `${API_BASE_URL}/companies?${params.toString()}`;
     const response = await fetch(url, {
